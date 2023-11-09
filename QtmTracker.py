@@ -26,11 +26,12 @@ class QtmTracker:
         self.eulers = None  # Currently the Yaw of the first body in Radians
         self.position = None  # [x,y,z] average (center) of bodies
         self.bodyDictionary = {}  # Dict of QTM Bodies {ID Value, 'Body Name'}
+        self.eulerDict = None
         self.loop.run_until_complete(self.__connect_to_qtm(self.ip))
 
     async def __connect_to_qtm(self, ip):
         while self.connection is None:
-            self.connection = await qtm.connect(ip)
+            self.connection = await qtm.connect(ip, version="1.21")
 
             if self.connection is None:
                 print("Failed to connect: waiting 5s")
@@ -56,11 +57,11 @@ class QtmTracker:
         numBodies = info[0]
         # print("bodyDict", self.bodyDictionary)
         posDict = {}
-        eulerDict = {}
+        self.eulerDict = {} if self.eulerDict is None else self.eulerDict
 
         for bodyKey in self.bodyDictionary:
             posDict[bodyKey] = bodies[bodyKey][0]
-            eulerDict[bodyKey] = bodies[bodyKey][1]
+            self.eulerDict[bodyKey] = bodies[bodyKey][1]
 
         x = y = z = 0
         for bodyPosition in posDict.values():
@@ -72,9 +73,9 @@ class QtmTracker:
         if not math.isnan(x) and not math.isnan(y) and not math.isnan(z):
             self.position = [x / 3, y / 3, z / 3]
 
-        if not math.isnan(eulerDict[0][2]):
+        if not math.isnan(self.eulerDict[0][2]):
             self.eulers = math.radians(
-                eulerDict[0][2]
+                self.eulerDict[0][2]
             )  # Currently the Yaw of the first body
 
         # print("POSITION",self.position)
@@ -87,7 +88,7 @@ class QtmTracker:
 
     def get_all_bodies(self):
         self.loop.run_until_complete(self.__live_stream_pos())
-        return self.bodyDictionary
+        return self.eulerDict
 
     async def __live_stream_pos(self):
         """Creates a dictionary of (ID, body) for all bodies."""

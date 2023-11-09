@@ -16,6 +16,8 @@ def wait_for_confirm(tracker: QtmTracker):
     while True:
         bodies = tracker.get_all_bodies()
 
+        print(bodies)
+
         # do magic
         confirm_response = input("confirm gesture?")
 
@@ -29,6 +31,9 @@ def main():
     # ip from VVValter code
     tracker = QtmTracker("10.76.30.91")
     arduino = connect_to_arduino_serial()
+    while True:
+        bodies = tracker.get_all_bodies()
+        print(bodies)
 
     while True:
         wait_for_gesture(tracker)
