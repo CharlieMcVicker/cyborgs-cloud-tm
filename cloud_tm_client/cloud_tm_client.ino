@@ -37,32 +37,31 @@ enum State
   WaitingForCommand,
   Opening,
   Closing,
-}
+};
 
-State state = State.WaitingForCommmand;
-String command = "";
+State state = WaitingForCommand;
 
 void loop()
 {
 
   switch (state)
   {
-  case State.WaitingForCommand:
-    command = Serial.readStringUntil("\n");
+  case WaitingForCommand:
+    String command = Serial.readStringUntil("\n");
     if (command == "OPEN_VALVE")
     {
-      serial.println("opening");
-      state = State.Opening;
-      stepper.moveTo(STEPS_PER_REVOLUTION / 4);
+      Serial.println("opening");
+      state = Opening;
+      stepper.moveTo(STEP_PER_REVOLUTION / 4);
     }
     else if (command == "CLOSE_VALVE")
     {
-      serial.println("closing");
-      state = State.Closing;
+      Serial.println("closing");
+      state = Closing;
       stepper.moveTo(0);
     }
-  case State.Opening:
-  case State.Closing:
+  case Opening:
+  case Closing:
     runMotor();
   }
 }
@@ -78,14 +77,14 @@ void runMotor()
 
     switch (state)
     {
-    case State.Closing:
-      serial.println("closed");
+    case Closing:
+      Serial.println("closed");
       break;
-    case State.Opening:
-      serial.println("opened");
+    case Opening:
+      Serial.println("opened");
       break;
     }
 
-    state = State.WaitingForCommand;
+    state = WaitingForCommand;
   }
 }
