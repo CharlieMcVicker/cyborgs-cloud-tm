@@ -8,10 +8,12 @@
 """
 
 import asyncio
+from typing import Dict
 import xml.etree.ElementTree as ET
 import pkg_resources
 import qtm
 from qtm import QRTPacket
+from qtm.packet import RT6DBodyEuler
 import math
 import numpy as np
 from time import sleep
@@ -86,9 +88,9 @@ class QtmTracker:
         self.loop.run_until_complete(self.__live_stream_pos())
         return self.position, self.eulers
 
-    def get_all_bodies(self):
+    def get_all_bodies(self) -> Dict[str, RT6DBodyEuler]:
         self.loop.run_until_complete(self.__live_stream_pos())
-        return self.eulerDict
+        return { name: self.eulerDict[id] for id, name in self.bodyDictionary.items() }
 
     async def __live_stream_pos(self):
         """Creates a dictionary of (ID, body) for all bodies."""
