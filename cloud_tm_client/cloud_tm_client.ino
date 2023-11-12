@@ -14,7 +14,7 @@ int currentSteps = 0;          // The current number of steps taken.
 #define FULLSTEP 4
 // I think maybe there are only 200 steps per rotation... the "step angle" is
 // listed as 1.80º
-#define STEP_PER_REVOLUTION 2048 // this value is from datasheet -- this comment is from john
+#define STEP_PER_REVOLUTION 200 // this value is from datasheet -- this comment is from john, said 2048
 
 AccelStepper stepper = AccelStepper(MOTOR_INTERFACE_TYPE, STEP, DIR); // Create a new instance of the AccelStepper class
 
@@ -25,8 +25,8 @@ void setup()
   Serial.flush();
 
   // Setup the motor
-  stepper.setMaxSpeed(1000.0);   // set the maximum speed
-  stepper.setAcceleration(50.0); // set acceleration
+  stepper.setMaxSpeed(100.0);   // set the maximum speed
+  stepper.setAcceleration(20.0); // set acceleration
   stepper.setSpeed(200);         // set initial speed
   stepper.setCurrentPosition(0); // set position
   // stepper.moveTo(STEP_PER_REVOLUTION); // set target position: 64 steps <=> one revolution
@@ -40,6 +40,7 @@ enum State
 };
 
 State state = WaitingForCommand;
+String command = "";
 
 void loop()
 {
@@ -47,7 +48,7 @@ void loop()
   switch (state)
   {
   case WaitingForCommand:
-    String command = Serial.readStringUntil("\n");
+    command = Serial.readStringUntil('\n');
     if (command == "OPEN_VALVE")
     {
       Serial.println("opening");
@@ -73,7 +74,7 @@ void runMotor()
   if (stepper.distanceToGo() == 0)
   {
     // mot sure what this does? maybe keeps it spinning?
-    // stepper.moveTo(stepper.currentPosition());
+    stepper.moveTo(stepper.currentPosition());
 
     switch (state)
     {
