@@ -28,15 +28,15 @@ SECONDS_TO_OPEN = 4
 def water_plant(arduino: Serial):
     print("Starting watering cycle")
 
-    print("Opening valve...", end=" ")
+    print("Opening valve...", end=" ", flush=True)
     send_command(arduino, ArdunioCommand.OPEN_VALVE)
 
-    result = arduino.read_until()
+    result = arduino.read_until().strip()
     assert (
         result == b"opening"
     ), f"Expected valve to start opening, got response {result.decode()}"
 
-    result = arduino.read_until()
+    result = arduino.read_until().strip()
     assert (
         result == b"opened"
     ), f"Expected valve to fully open, got response {result.decode()}"
@@ -45,15 +45,15 @@ def water_plant(arduino: Serial):
 
     time.sleep(SECONDS_TO_OPEN)
 
-    print("Closing valve...", end=" ")
+    print("Closing valve...", end=" ", flush=True)
     send_command(arduino, ArdunioCommand.CLOSE_VALVE)
 
-    result = arduino.read_until()
+    result = arduino.read_until().strip()
     assert (
         result == b"closing"
     ), f"Expected valve to start closing, got response {result.decode()}"
 
-    result = arduino.read_until()
+    result = arduino.read_until().strip()
     assert (
         result == b"closed"
     ), f"Expected valve to fully close, got response {result.decode()}"
